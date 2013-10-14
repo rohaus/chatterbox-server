@@ -5,5 +5,19 @@
  * node module documentation at http://nodejs.org/api/modules.html. */
 
 var handleRequest = function(request, response) {
+  console.log('here');
+  var statusCode = 200;
+  var headers = defaultCorsHeaders;
+  headers['Content-Type'] = "text/plain";
+  response.writeHead(statusCode, headers);
+  response.end("hello");
+};
 
+module.exports.handleRequest = handleRequest;
+
+var defaultCorsHeaders = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "access-control-allow-headers": "content-type, accept",
+  "access-control-max-age": 10 // Seconds.
 };
