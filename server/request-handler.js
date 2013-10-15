@@ -11,20 +11,22 @@ var handleRequest = function(request, response) {
   console.log("Serving request type " + request.method + " for url " + request.url);
   var message, statusCode = 200;
   var headers = defaultCorsHeaders;
-  // console.log("request is: ", request);
-  // console.log("response is: ", response);
   headers['Content-Type'] = "text/plain";
   if (request.method === "OPTIONS") {
     console.log('options');
     message = "options";
-  } else if (request.method === "GET") {
-    console.log('get');
-    message = JSON.stringify({results: messages});
-  } else if (request.method === "POST"){
-
-
+  } else if (request.method === "GET" && request.url.split("?")[0] === "/1/classes/chatterbox") {
+    var query = request.url.split("?")[1];
+    var queries = query.split('&');
+    var queryHash = {};
+    for (var i=0; i<queries.length; i++){
+      var temp = queries[i].split('=');
+      queryHash[temp[0]] = temp[1];
+    }
+    var tempMessages = messages.slice(parseInt(queryHash["limit"], 10) * -1);
+    message = JSON.stringify({results: tempMessages});
+  } else if (request.method === "POST" && request.url === "/1/classes/chatterbox"){
     request.on('data', function(data){
-      // var buffer = request.pipe(response);
       message = querystring.parse(querystring.escape(data));
       message = JSON.parse(Object.keys(message)[0]);
       var defaults = {
@@ -38,7 +40,6 @@ var handleRequest = function(request, response) {
       messages.push(JSON.stringify(defaults));
       console.log("message is: ", defaults);
     });
-    // console.log(request.data);
   }
   response.writeHead(statusCode, headers);
   response.end(message);
