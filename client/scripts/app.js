@@ -61,7 +61,10 @@ var fetch = function(property, value){
 };
 
 var filterMsgs = function(msgObj, property, value){
-  var messages = msgObj.results;
+  var messages = [];
+  for(var i = 0; i < msgObj.results.length; i++){
+    messages.push(JSON.parse(msgObj.results[i]));
+  }
   if(property){
     messages = _.filter(messages, function(msg){
       return msg[property] === value;
