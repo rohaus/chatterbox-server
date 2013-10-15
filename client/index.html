@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>chatterbox</title>
+    <link rel="stylesheet" href="styles/styles.css">
+
+    <!-- external javascript -->
+    <script src="../bower_components/jquery/jquery.min.js"></script>
+    <script src="../bower_components/underscore/underscore-min.js"></script>
+    <!-- internal javascript -->
+    <script src="scripts/config.js"></script>
+    <script src="scripts/app.js"></script>
+  </head>
+  <body>
+    <h>Lobby</h>
+    <nav class='right'>
+      <form>
+        <input class='roomInput' type='text'></input>
+        <button class='roomSubmit'>Submit Room</button>
+        <select></select>
+      </form>
+      <ul class="friends"></ul>
+    </nav>
+    <div id="main">
+      <h1>Chat-Client</h1>
+      <section class="chatbox left"></section>
+      <form>
+        <input class="textBox" type="text"></input>
+        <button class="send">Send Message</button>
+      </form>
+    </div>
+
+    <script>
+      $(document).ready(function(){
+        fetch();
+        $('.send').on('click', function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          var message = $('input.textBox').val();
+          var room = $('select').val();
+          send(message, room);
+          fetch('roomname', room);
+          $('input.textBox').val("");
+        });
+        $('select').on('change', function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          var room = $('select').val();
+          fetch('roomname', room);
+          $('h').text(room);
+        });
+        $('.roomSubmit').on('click', function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          var room = $('input.roomInput').val();
+          fetch('roomname', room);
+          updateRoomList(room);
+          $('h').text(room);
+        });
+        $('body').on('click', 'li.friend', function(){
+          var className = $(this).text();
+          $("."+className).toggleClass('highlight');
+        });
+      });
+    </script>
+
+  </body>
+</html>
