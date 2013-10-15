@@ -15,31 +15,41 @@ var handleRequest = function(request, response) {
   if (request.method === "OPTIONS") {
     console.log('options');
     message = "options";
-  } else if (request.method === "GET" && request.url.split("?")[0] === "/1/classes/chatterbox") {
-    var query = request.url.split("?")[1];
-    var queries = query.split('&');
-    var queryHash = {};
-    for (var i=0; i<queries.length; i++){
-      var temp = queries[i].split('=');
-      queryHash[temp[0]] = temp[1];
+  } else if (request.method === "GET") {
+    if (request.url.split("?")[0] === "/classes/room"){
+      var query = request.url.split("?")[1];
+      var queries = query.split('&');
+      var queryHash = {};
+      for (var i=0; i<queries.length; i++){
+        var temp = queries[i].split('=');
+        queryHash[temp[0]] = temp[1];
+      }
+      var tempMessages = messages.slice(parseInt(queryHash["limit"], 10) * -1);
+      message = JSON.stringify({results: tempMessages});
+    } else {
+      message = '[]';
     }
-    var tempMessages = messages.slice(parseInt(queryHash["limit"], 10) * -1);
-    message = JSON.stringify({results: tempMessages});
-  } else if (request.method === "POST" && request.url === "/1/classes/chatterbox"){
-    request.on('data', function(data){
-      message = querystring.parse(querystring.escape(data));
-      message = JSON.parse(Object.keys(message)[0]);
-      var defaults = {
-        "createdAt": Date(),
-        "objectID": "abc",
-        "roomname": message.roomname,
-        "text": message.text,
-        "updatedAt": Date(),
-        "username": message.username
-      };
-      messages.push(JSON.stringify(defaults));
-      console.log("message is: ", defaults);
-    });
+  } else if (request.method === "POST") {
+    if (request.url === "/classes/room"){
+      request.on('data', function(data){
+        message = querystring.parse(querystring.escape(data));
+        message = JSON.parse(Object.keys(message)[0]);
+        var defaults = {
+          "createdAt": Date(),
+          "objectID": "abc",
+          "roomname": message.roomname,
+          "text": message.text,
+          "updatedAt": Date(),
+          "username": message.username
+        };
+        messages.push(JSON.stringify(defaults));
+        console.log("message is: ", defaults);
+        statusCode = 201;
+      });
+    } else {
+      messages = '[]';
+      statusCode = 201;
+    }
   }
   response.writeHead(statusCode, headers);
   response.end(message);
