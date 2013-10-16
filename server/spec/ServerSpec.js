@@ -83,22 +83,22 @@ describe("Node Server Request Listener Function", function() {
  });
 
 
- it("Should 404 when asked for a nonexistent file", function() {
-   var req = new StubRequest("http://127.0.0.1:8080/arglebargle",
-                             "GET");
-   var res = new StubResponse();
+ // it("Should 404 when asked for a nonexistent file", function() {
+ //   var req = new StubRequest("http://127.0.0.1:8080/arglebargle",
+ //                             "GET");
+ //   var res = new StubResponse();
 
-   handler.handleRequest(req, res);
-   console.log("Res is " + res);
+ //   handler.handleRequest(req, res);
+ //   console.log("Res is " + res);
 
-   // Wait some time before checking results:
-   waits(1000);
+ //   // Wait some time before checking results:
+ //   waits(1000);
 
-   runs(function() {
-     expect(res._responseCode).toEqual(404);
-     expect(res._ended).toEqual(true);
-   });
- });
+ //   runs(function() {
+ //     expect(res._responseCode).toEqual(404);
+ //     expect(res._ended).toEqual(true);
+ //   });
+ // });
 
 
 });

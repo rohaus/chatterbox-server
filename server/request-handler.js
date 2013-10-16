@@ -45,7 +45,7 @@ var handleRequest = exports.handleRequest = function(request, response) {
       message.objectID = objectID;
       message.createdAt = Date();
       messages.push(message);
-      sendResponse(response, "{}");
+      sendResponse(response, "{}", 201);
     });
   };
 

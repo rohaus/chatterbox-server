@@ -11,7 +11,7 @@ var server = http.createServer(function(request, response){
      if (handler){
        handler.handleRequest(request, response);
      } else {
-       handler.sendResponse(response, "", 404);
+       requestHandler.sendResponse(response, "", 404);
      }
 });
 console.log("Listening on http://" + ip + ":" + port);
