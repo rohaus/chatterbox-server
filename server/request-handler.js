@@ -14,14 +14,14 @@ var messages = [];
 
 var objectID = 0;
 
-var sendResponse = function(response, msg, status){
+var sendResponse = exports.sendResponse =  function(response, msg, status){
   status = status || 200;
   response.writeHead(status, headers);
   response.end(msg);
 };
 
 
-var handleRequest = function(request, response) {
+var handleRequest = exports.handleRequest = function(request, response) {
   console.log("Serving request type " + request.method + " for url " + request.url);
   var message;
   var caseObj = {};
@@ -50,7 +50,6 @@ var handleRequest = function(request, response) {
   };
 
   var key = request.method.toLowerCase();
+
   caseObj[key]();
 };
-
-module.exports.handleRequest = handleRequest;
