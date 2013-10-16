@@ -3,63 +3,54 @@
  * basic-server.js.  So you must figure out how to export the function
  * from this file and include it in basic-server.js. Check out the
  * node module documentation at http://nodejs.org/api/modules.html. */
-
-var querystring = require("querystring");
-var messages = [];
-// var messages = require('./message-data.js');
-var handleRequest = function(request, response) {
-  console.log("Serving request type " + request.method + " for url " + request.url);
-  var message, statusCode = 200;
-  var headers = defaultCorsHeaders;
-  headers['Content-Type'] = "text/plain";
-  if (request.method === "OPTIONS") {
-    console.log('options');
-    message = "options";
-  } else if (request.method === "GET") {
-    if (request.url.split("?")[0] === "/classes/room"){
-      var query = request.url.split("?")[1];
-      var queries = query.split('&');
-      var queryHash = {};
-      for (var i=0; i<queries.length; i++){
-        var temp = queries[i].split('=');
-        queryHash[temp[0]] = temp[1];
-      }
-      var tempMessages = messages.slice(parseInt(queryHash["limit"], 10) * -1);
-      message = JSON.stringify({results: tempMessages});
-    } else {
-      message = '[]';
-    }
-  } else if (request.method === "POST") {
-    if (request.url === "/classes/room"){
-      request.on('data', function(data){
-        message = querystring.parse(querystring.escape(data));
-        message = JSON.parse(Object.keys(message)[0]);
-        var defaults = {
-          "createdAt": Date(),
-          "objectID": "abc",
-          "roomname": message.roomname,
-          "text": message.text,
-          "updatedAt": Date(),
-          "username": message.username
-        };
-        messages.push(JSON.stringify(defaults));
-        console.log("message is: ", defaults);
-        statusCode = 201;
-      });
-    } else {
-      messages = '[]';
-      statusCode = 201;
-    }
-  }
-  response.writeHead(statusCode, headers);
-  response.end(message);
-};
-
-var defaultCorsHeaders = {
+var headers = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
   "access-control-allow-headers": "content-type, accept",
-  "access-control-max-age": 10 // Seconds.
+  "access-control-max-age": 10, // Seconds.
+  "Content-Type": "application/json"
+};
+var messages = [];
+
+var objectID = 0;
+
+var sendResponse = function(response, msg, status){
+  status = status || 200;
+  response.writeHead(status, headers);
+  response.end(msg);
+};
+
+
+var handleRequest = function(request, response) {
+  console.log("Serving request type " + request.method + " for url " + request.url);
+  var message;
+  var caseObj = {};
+
+  caseObj.options = function(){
+    sendResponse(response, '');
+  };
+
+  caseObj.get = function(){
+    sendResponse(response, JSON.stringify(messages));
+  };
+
+  caseObj.post = function(){
+    var data = '';
+    request.on('data', function(chunk){
+      data += chunk;
+    });
+    request.on('end', function(){
+      message = JSON.parse(data);
+      objectID++;
+      message.objectID = objectID;
+      message.createdAt = Date();
+      messages.push(message);
+      sendResponse(response, "{}");
+    });
+  };
+
+  var key = request.method.toLowerCase();
+  caseObj[key]();
 };
 
 module.exports.handleRequest = handleRequest;

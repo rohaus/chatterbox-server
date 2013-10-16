@@ -3,7 +3,7 @@ anytime we have an event we want to reset the interval?
 
 */
 
-var url = 'http://127.0.0.1:8081/1/classes/chatterbox';
+var url = 'http://127.0.0.1:8081/classes/room';
 var timer;
 var rooms = {};
 var users = {};
@@ -47,7 +47,7 @@ var fetch = function(property, value){
       order:'-createdAt'
     },
     success:function(data){
-      data = JSON.parse(data);
+      // data = JSON.stringify(data);
       console.log("data in the get request is: ",data);
       console.log('Messages retrieved.');
       filterMsgs(data, property, value);
@@ -61,10 +61,7 @@ var fetch = function(property, value){
 };
 
 var filterMsgs = function(msgObj, property, value){
-  var messages = [];
-  for(var i = 0; i < msgObj.results.length; i++){
-    messages.push(JSON.parse(msgObj.results[i]));
-  }
+  var messages = msgObj;
   if(property){
     messages = _.filter(messages, function(msg){
       return msg[property] === value;
@@ -89,7 +86,7 @@ var send = function(text, room){
       console.log('Message successfully sent.');
     },
     error:function(){
-      console.log('Error in sending.');
+      console.log('Error in sending.', arguments);
     }
   });
 };
